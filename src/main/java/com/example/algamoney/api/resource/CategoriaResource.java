@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.StreamingHttpOutputMessage.Body;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,12 +61,18 @@ public class CategoriaResource {
 	}
 
 	/**
-	 * Retorna uma categoria informado um ID utilizando o método getOne(codigo) do JpaRepository 
+	 * Retorna uma categoria informado um ID utilizando o método findOne(codigo) do JpaRepository 
 	 * @param codigo (ID)
 	 * @return Categoria
 	 */
 	@GetMapping("/{codigo}") // Ja existe o método GET para /categorias, por isso é necessário mapear outros métodos GET com um novo PATH
-	public Categoria buscarPeloCodigo(@PathVariable Long codigo) {
-		return categoriaRepository.findOne(codigo);
+	public ResponseEntity<Categoria> buscarPeloCodigo(@PathVariable Long codigo, HttpServletResponse response) {
+		if (categoriaRepository.findOne(codigo) != null) {
+			return ResponseEntity.ok().body(categoriaRepository.findOne(codigo));
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+			
+		
 	}
 }
