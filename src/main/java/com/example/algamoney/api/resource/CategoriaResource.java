@@ -1,12 +1,13 @@
 package com.example.algamoney.api.resource;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,8 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.example.algamoney.api.event.RecursoCriadoEvent;
 import com.example.algamoney.api.model.Categoria;
 import com.example.algamoney.api.repository.CategoriaRepository;
 
@@ -25,6 +26,9 @@ public class CategoriaResource {
 	
 	@Autowired // Injeção de Dependência
 	private CategoriaRepository categoriaRepository;
+	
+	@Autowired
+	private ApplicationEventPublisher publisher;
 	
 	/**
 	 * Retorna todas as categorias utilizando o método findAll() do JpaRepository 
@@ -49,15 +53,19 @@ public class CategoriaResource {
 		// Executa o método save do JpaRepository e retorna a categoria salva
 		Categoria categoriaSalva = categoriaRepository.save(categoria);
 		
+		// Antes da implementação do evento
 		// Retorna a uri da categoria salva
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
-			.buildAndExpand(categoriaSalva.getCodigo()).toUri();
+//		URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+//			.buildAndExpand(categoriaSalva.getCodigo()).toUri();
+//		
+//		// Pelas regras do REST, no POST, é necessário devolver no HEADER da resposta a "Location" com a URI do recurso criado
+//		response.setHeader("Location", uri.toASCIIString());
 		
-		// Pelas regras do REST, no POST, é necessário devolver no HEADER da resposta a "Location" com a URI do recurso criado
-		response.setHeader("Location", uri.toASCIIString());
 		
+		// Depois da implementação do evento
+		publisher.publishEvent(new RecursoCriadoEvent(this, response, categoriaSalva.getCodigo()));
 		
-		return ResponseEntity.created(uri).body(categoriaSalva);
+		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
 	}
 
 	/**
