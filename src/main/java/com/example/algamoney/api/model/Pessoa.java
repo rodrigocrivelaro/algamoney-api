@@ -6,8 +6,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "pessoa")
@@ -64,6 +67,12 @@ public class Pessoa {
 		return "Pessoa [codigo=" + codigo + ", nome=" + nome + ", endereco=" + endereco + ", ativo=" + ativo + "]";
 	}
 
+	@JsonIgnore // Necessário passar a notação para que o Jackson ignore e não pense que é um atributo da classe
+	@Transient // Necessário passar a notação para que o Hibernate ignore e não pense que é um atributo da tabela
+	public boolean isInativo() {
+		return !this.ativo;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
