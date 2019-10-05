@@ -1,0 +1,89 @@
+--Fontes
+-- https://rogerdudler.github.io/git-guide/index.pt_BR.html
+-- http://www.devfuria.com.br/git/tutorial-iniciando-git/
+
+
+-- Integrar um diretório local com o GITHUB
+git init
+git add .
+git commit -m "Texto do commit"
+git remote add origin https://github.com/rodrigocrivelaro/"nomedorepositorio".git
+git remote -v -- para verificar se integrou
+git push origin master
+
+-- Remover a integração de um diretório com o GITHUB
+rm -rf .git
+
+-- Atualizar repositório GITHUB
+git add .
+git commit -m "Texto do commit"
+git push origin master
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+Nota sobre o Access Token no Postman:
+	- Para fazer a requisição do access token é preciso criar um POST em localhost:8080/oauth/token
+		- Na aba Authorization escolher o tipo Basic Auth passando o usuário e senha de cliente 
+			e não de usuário
+		- Na aba Body escolher x-www-form-urlencoded e criar as propriedades:
+			- client = nome do cliente
+			- username = usuário da API
+			- password = senha do usuário da API
+			- grant_type = password
+	
+	- Ao clicar em enviar retornará um json com o accsess_token e o token_type a ser utilizado;
+
+	- Lembrando que o access_tokem dura o tempo definido pela propriedade:
+		-.accessTokenValiditySeconds(20), no caso 20 segundos, 
+	do método:
+		- configure(ClientDetailsServiceConfigurer clients) 
+	da classe:
+		-com.example.algamoney.api.config.AuthorizationServerConfig.java;
+
+	- Após fazer a requisição do access token deverá ser criado na rotina que esta tentando acessar a API um Header Authorization = Beare + o access token gerado.
+		- Lembrar que na guia Authorization o tipo de autenticação deve ser No Auth, pois a validação já está sendo feita no Header.
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+Nota sobre o Access Token com Refresh Token no Postman:
+	- Para fazer a revalidação do acces token (refresh token) é preciso criar um POST em localhost:8080/oauth/token 
+		- Na aba Authorization escolher o tipo Basic Auth passando o usuário e senha de cliente 
+			e não de usuário
+		- Na aba Body escolher x-www-form-urlencoded e criar as propriedades:
+			grant_type = refresh_token
+			refresh_token = o refresh token gerado no access token				
+
+	- Ao clicar em enviar retornará um json com o accsess_token e o token_type a ser utilizado;
+	
+	- Lembrando que o access_tokem dura o tempo definido pela propriedade:
+		-.accessTokenValiditySeconds(20), no caso 20 segundos, 
+	e o refresh token dura o tempo definido pela propriedade: 
+		- .refreshTokenValiditySeconds(3600 * 24), no caso 24 horas, 
+	ambas no método:
+		- configure(ClientDetailsServiceConfigurer clients) 
+	da classe:
+		-com.example.algamoney.api.config.AuthorizationServerConfig.java;
+	
+	- Após fazer a requisição do access token deverá ser criado na rotina que esta tentando acessar a API um Header Authorization = Beare + o access token gerado.
+		- Lembrar que na guia Authorization o tipo de autenticação deve ser No Auth, pois a validação já está sendo feita no Header.
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
