@@ -25,8 +25,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			.withClient("angular") // Usuário e senha da aplicação cliente
 			.secret("@ngul@r0") // Usuário e senha da aplicação cliente
 			.scopes("read", "write")
-			.authorizedGrantTypes("password")
-			.accessTokenValiditySeconds(1800); // Tempo de vida do Access Token 30min
+			.authorizedGrantTypes("password", "refresh_token")
+			.accessTokenValiditySeconds(20) // Tempo de vida do Access Token 20 segundos
+			.refreshTokenValiditySeconds(3600 * 24);  // Tempo de vida do refresh Token 24hs
 	}
 	
 	/**
@@ -51,6 +52,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		endpoints
 			.tokenStore(tokenStore())
 			.accessTokenConverter(accessTokenConverter())
+			.reuseRefreshTokens(false)
 			.authenticationManager(authenticationManager);
 	}
 
@@ -63,7 +65,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Bean
 	public TokenStore tokenStore() {
-//		return new InMemoryTokenStore();
 		return new JwtTokenStore(accessTokenConverter());
 	}
 }
