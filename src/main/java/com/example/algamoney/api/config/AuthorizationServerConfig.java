@@ -22,12 +22,19 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory()
-			.withClient("angular") // Usuário e senha da aplicação cliente
-			.secret("@ngul@r0") // Usuário e senha da aplicação cliente
-			.scopes("read", "write")
-			.authorizedGrantTypes("password", "refresh_token")
-			.accessTokenValiditySeconds(20) // Tempo de vida do Access Token 20 segundos
-			.refreshTokenValiditySeconds(3600 * 24);  // Tempo de vida do refresh Token 24hs
+				.withClient("angular") // Usuário e senha da aplicação cliente
+				.secret("@ngul@r0") // Usuário e senha da aplicação cliente
+				.scopes("read", "write")
+				.authorizedGrantTypes("password", "refresh_token")
+				.accessTokenValiditySeconds(1800) // Tempo de vida do Access Token 30 minutos
+				.refreshTokenValiditySeconds(3600 * 24) // Tempo de vida do refresh Token 24hs
+			.and()
+				.withClient("mobile") // Usuário e senha da aplicação cliente
+				.secret("m0b1l30") // Usuário e senha da aplicação cliente
+				.scopes("read")
+				.authorizedGrantTypes("password", "refresh_token")
+				.accessTokenValiditySeconds(1800) // Tempo de vida do Access Token 30 minutos
+				.refreshTokenValiditySeconds(3600 * 24);  // Tempo de vida do refresh Token 24hs
 	}
 	
 	@Override

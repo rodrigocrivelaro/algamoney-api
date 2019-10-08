@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,7 @@ public class CategoriaResource {
 	 * @return List<Categoria> - uma lista de categorias
 	 */
 	@GetMapping // Método GET
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and #oauth2.hasScope('read')")
 	public List<Categoria> listar() {
 		return categoriaRepository.findAll();
 	}
@@ -48,19 +50,10 @@ public class CategoriaResource {
 	 * @return ResponseEntity.created(uri).body(categoriaSalva) - categoriaSalva para o body e o status 201 Created
 	 */
 	@PostMapping // Método POST
-//	@ResponseStatus(HttpStatus.CREATED) 
+	@PreAuthorize("hasAuthority('ROLE_CADASTRAR_CATEGORIA') and #oauth2.hasScope('write')")
 	public ResponseEntity<Categoria> criar(@Valid @RequestBody Categoria categoria, HttpServletResponse response) {
 		// Executa o método save do JpaRepository e retorna a categoria salva
 		Categoria categoriaSalva = categoriaRepository.save(categoria);
-		
-		// Antes da implementação do evento
-		// Retorna a uri da categoria salva
-//		URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
-//			.buildAndExpand(categoriaSalva.getCodigo()).toUri();
-//		
-//		// Pelas regras do REST, no POST, é necessário devolver no HEADER da resposta a "Location" com a URI do recurso criado
-//		response.setHeader("Location", uri.toASCIIString());
-		
 		
 		// Depois da implementação do evento
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, categoriaSalva.getCodigo()));
@@ -74,13 +67,13 @@ public class CategoriaResource {
 	 * @return Categoria
 	 */
 	@GetMapping("/{codigo}") // Ja existe o método GET para /categorias, por isso é necessário mapear outros métodos GET com um novo PATH
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_CATEGORIA') and #oauth2.hasScope('read')")
 	public ResponseEntity<Categoria> buscarPeloCodigo(@PathVariable Long codigo, HttpServletResponse response) {
 		if (categoriaRepository.findOne(codigo) != null) {
 			return ResponseEntity.ok().body(categoriaRepository.findOne(codigo));
 		} else {
 			return ResponseEntity.notFound().build();
 		}
-			
-		
 	}
+	
 }
